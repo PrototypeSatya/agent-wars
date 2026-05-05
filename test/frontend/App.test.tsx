@@ -16,15 +16,43 @@ const mockProducts: Product[] = [
 ];
 
 vi.mock('../../src/frontend/src/hooks/useProducts');
-vi.mock('../../src/frontend/src/api');
+vi.mock('../../src/frontend/src/hooks/useCart');
 
 import { useProducts } from '../../src/frontend/src/hooks/useProducts';
-import { addToCart } from '../../src/frontend/src/api';
+import { CartApiError } from '../../src/frontend/src/api';
+import { useCart } from '../../src/frontend/src/hooks/useCart';
 
 const mockedUseProducts = vi.mocked(useProducts);
-const mockedAddToCart = vi.mocked(addToCart);
+const mockedUseCart = vi.mocked(useCart);
+
+const add = vi.fn();
+const update = vi.fn();
+const remove = vi.fn();
+const clear = vi.fn();
+const refetch = vi.fn();
 
 describe('App', () => {
+  beforeEach(() => {
+    add.mockReset();
+    update.mockReset();
+    remove.mockReset();
+    clear.mockReset();
+    refetch.mockReset();
+
+    mockedUseCart.mockReturnValue({
+      items: [],
+      loading: false,
+      error: null,
+      itemCount: 0,
+      subtotal: 0,
+      add,
+      update,
+      remove,
+      clear,
+      refetch,
+    });
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -79,13 +107,7 @@ describe('App', () => {
 
   it('shows notification after adding to cart', async () => {
     mockedUseProducts.mockReturnValue({ products: mockProducts, loading: false, error: null });
-    mockedAddToCart.mockResolvedValue({
-      productId: 1,
-      productName: 'Test Headphones',
-      unitPrice: 79.99,
-      quantity: 1,
-      totalPrice: 79.99,
-    });
+    add.mockResolvedValue(undefined);
 
     render(<App />);
     await userEvent.click(screen.getByRole('button', { name: /add test headphones to cart/i }));
@@ -95,11 +117,51 @@ describe('App', () => {
 
   it('shows error notification when add to cart fails', async () => {
     mockedUseProducts.mockReturnValue({ products: mockProducts, loading: false, error: null });
-    mockedAddToCart.mockRejectedValue(new Error('Server error'));
+    add.mockRejectedValue(new Error('Server error'));
 
     render(<App />);
     await userEvent.click(screen.getByRole('button', { name: /add test headphones to cart/i }));
 
     expect(await screen.findByRole('status')).toHaveTextContent('Failed to add item to cart.');
+  });
+
+  it('shows API error message when cart add exceeds limit', async () => {
+    mockedUseProducts.mockReturnValue({ products: mockProducts, loading: false, error: null });
+    add.mockRejectedValue(new CartApiError(400, 'Cannot exceed maximum quantity of 5 per product.'));
+
+    render(<App />);
+    await userEvent.click(screen.getByRole('button', { name: /add test headphones to cart/i }));
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Cannot exceed maximum quantity of 5 per product.');
+  });
+
+  it('opens cart drawer from header button', async () => {
+    mockedUseProducts.mockReturnValue({ products: [], loading: false, error: null });
+
+    render(<App />);
+    await userEvent.click(screen.getByRole('button', { name: /shopping cart with 0 items/i }));
+
+    expect(screen.getByRole('dialog', { name: /your cart/i })).toBeInTheDocument();
+  });
+
+  it('uses cart hook item count for header badge', () => {
+    mockedUseProducts.mockReturnValue({ products: [], loading: false, error: null });
+    mockedUseCart.mockReturnValue({
+      items: [],
+      loading: false,
+      error: null,
+      itemCount: 4,
+      subtotal: 100,
+      add,
+      update,
+      remove,
+      clear,
+      refetch,
+    });
+
+    render(<App />);
+
+    expect(screen.getByRole('button', { name: /shopping cart with 4 items/i })).toBeInTheDocument();
+    expect(screen.getByText('4')).toBeInTheDocument();
   });
 });

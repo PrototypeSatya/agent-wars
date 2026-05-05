@@ -1,0 +1,157 @@
+.cart {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+}
+
+.cart__overlay {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(5, 19, 31, 0.35);
+  cursor: pointer;
+}
+
+.cart__panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: min(420px, 100vw);
+  height: 100%;
+  background: #fff;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  animation: cart-slide-in 180ms ease-out;
+}
+
+@keyframes cart-slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.cart__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #ececec;
+  padding-bottom: 0.75rem;
+}
+
+.cart__close {
+  border: 0;
+  background: transparent;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.cart__list {
+  list-style: none;
+  margin: 0;
+  padding: 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: auto;
+  flex: 1;
+}
+
+.cart__line {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 0.75rem;
+  align-items: start;
+  border-bottom: 1px solid #f1f1f1;
+  padding-bottom: 0.75rem;
+}
+
+.cart__thumb {
+  border-radius: 8px;
+  background: #f7f7f7;
+}
+
+.cart__name {
+  font-weight: 700;
+}
+
+.cart__price,
+.cart__line-total,
+.cart__footer {
+  font-size: 0.9rem;
+}
+
+.cart__line-total {
+  font-weight: 700;
+}
+
+.cart__controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.cart__stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #d9d9d9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.cart__stepper button {
+  border: 0;
+  background: #f4f4f4;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.cart__stepper button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.cart__stepper span {
+  min-width: 34px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.cart__remove,
+.cart__clear,
+.cart__retry,
+.cart__continue {
+  border: 0;
+  background: transparent;
+  color: var(--blue);
+  cursor: pointer;
+}
+
+.cart__line-error,
+.cart__state--error {
+  color: #c13333;
+  margin-top: 0.25rem;
+}
+
+.cart__state {
+  margin: auto 0;
+  text-align: center;
+}
+
+.cart__footer {
+  border-top: 1px solid #ececec;
+  padding-top: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cart__checkout {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  font-weight: 700;
+  background: #d8d8d8;
+  color: #4a4a4a;
+}

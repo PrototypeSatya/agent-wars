@@ -3,14 +3,17 @@ import type { Product } from './types';
 import { Header } from './components/Header';
 import { HeroBanner } from './components/HeroBanner';
 import { ProductList } from './components/ProductList';
+import { Cart } from './components/Cart';
 import { useProducts } from './hooks/useProducts';
-import { addToCart } from './api';
+import { CartApiError } from './api';
+import { useCart } from './hooks/useCart';
 import './App.css';
 
 export function App() {
   const { products, loading, error } = useProducts();
+  const cart = useCart();
   const [cartMessage, setCartMessage] = useState<string | null>(null);
-  const [cartItemCount, setCartItemCount] = useState(0);
+  const [cartOpen, setCartOpen] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -21,19 +24,18 @@ export function App() {
 
   async function handleAddToCart(product: Product) {
     try {
-      await addToCart({ productId: product.id, quantity: 1 });
-      setCartItemCount((prev) => prev + 1);
+      await cart.add(product.id, 1);
       setCartMessage(`"${product.name}" added to cart!`);
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => setCartMessage(null), 3000);
-    } catch {
-      setCartMessage('Failed to add item to cart.');
+    } catch (error) {
+      setCartMessage(error instanceof CartApiError ? error.message : 'Failed to add item to cart.');
     }
   }
 
   return (
     <div className="app">
-      <Header cartItemCount={cartItemCount} />
+      <Header cartItemCount={cart.itemCount} onCartClick={() => setCartOpen(true)} />
       <HeroBanner />
 
       <main className="app__main">
@@ -51,6 +53,8 @@ export function App() {
           <ProductList products={products} onAddToCart={handleAddToCart} />
         )}
       </main>
+
+      <Cart open={cartOpen} onClose={() => setCartOpen(false)} cart={cart} />
     </div>
   );
 }

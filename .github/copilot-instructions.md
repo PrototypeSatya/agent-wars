@@ -108,8 +108,10 @@ test/backend/MockEcommerce.Api.Tests/
 - ✅ **Features Implemented:**
   - Product list display with ProductCard components
   - Product fetching via `useProducts` hook from backend API
-  - Add-to-cart functionality with visual feedback (success message)
-  - Cart item counter in header
+  - Add-to-cart functionality with backend-validated limits and visual feedback
+  - Header cart button opens a cart drawer for full cart management
+  - Cart item counter in header derived from cart API state
+  - Cart drawer supports quantity updates, remove item, clear cart, and subtotal view
   - Hero banner and branding
   - Responsive layout with styled components
 - ✅ **API Integration:** Fetch-based HTTP client for backend communication
@@ -123,7 +125,11 @@ test/backend/MockEcommerce.Api.Tests/
   - **Endpoints:**
     - `GET /api/products` - Returns all products
     - `GET /api/products/{id}` - Returns single product
-    - Cart management endpoints (add, get, remove items)
+    - `GET /api/cart` - Returns current cart lines
+    - `POST /api/cart` - Adds or increments cart line (max 5 per product)
+    - `PUT /api/cart/{productId}` - Sets quantity for an existing cart line
+    - `DELETE /api/cart/{productId}` - Removes a cart line
+    - `DELETE /api/cart` - Clears cart
   - **CORS:** Configured to allow frontend communication
   - **OpenAPI:** Swagger documentation enabled at `/openapi/v1.json`
 - ✅ **Architecture:** Clean layered design (Endpoints → Services → Models)
@@ -178,7 +184,10 @@ public class Product
 public class CartItem
 {
     public int ProductId { get; set; }             // Reference to product
-    public int Quantity { get; set; }              // Units in cart
+  public string ProductName { get; set; }        // Snapshot name at add time
+  public decimal UnitPrice { get; set; }         // Snapshot price at add time
+  public int Quantity { get; set; }              // Units in cart
+  public decimal TotalPrice => UnitPrice * Quantity;
 }
 ```
 

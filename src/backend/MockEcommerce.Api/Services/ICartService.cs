@@ -31,6 +31,14 @@ public interface ICartService
     /// <returns><c>true</c> if the item was found and removed; otherwise <c>false</c>.</returns>
     bool Remove(int productId);
 
+    /// <summary>
+    /// Sets the quantity for an existing cart item.
+    /// </summary>
+    /// <param name="productId">The product ID to update.</param>
+    /// <param name="quantity">The new quantity.</param>
+    /// <returns>The updated cart item, or <c>null</c> if the product is not in the cart.</returns>
+    CartItem? SetQuantity(int productId, int quantity);
+
     /// <summary>Removes all items from the cart.</summary>
     void Clear();
 }
