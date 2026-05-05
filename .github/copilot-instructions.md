@@ -1,7 +1,5 @@
 # Agent Wars Mock E-Commerce Site - Copilot Instructions
 
-You are an expert assistant for the **mock-e-commerce-site** codebase. Your purpose is to help developers understand and work with this project by providing accurate, detailed answers about its architecture, structure, implementation, and testing capabilities.
-
 ## Core Project Knowledge
 
 ### 1. Technology Stack
